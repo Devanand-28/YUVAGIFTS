@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store Management Portal – Yuvagifts</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="nav"></div>
+
+<!-- Admin Hero Banner -->
+<div class="admin-hero">
+  <div class="wrap">
+    <div class="admin-hero-badge">Administrator Portal</div>
+    <h1>Storefront Management &amp; Analytics</h1>
+    <p>Manage product catalog, inventory levels, pricing, and client order logs.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="section" style="padding-top:2rem">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-icon">📦</span>
+        <h3>Active Products</h3>
+        <p id="totalProducts">0</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">💬</span>
+        <h3>Inquiries &amp; Orders</h3>
+        <p id="totalSales">0</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🏷️</span>
+        <h3>Units Dispatched</h3>
+        <p id="productsSold">0</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">💰</span>
+        <h3>Gross Revenue</h3>
+        <p id="totalRevenue">₹0</p>
+      </div>
+    </div>
+
+    <!-- Add / Edit Product Form -->
+    <div class="admin-panel" id="productFormPanel">
+      <div class="admin-panel-header">
+        <h3 id="formTitle">Create New Catalog Product</h3>
+        <button class="admin-form-toggle" id="formToggleBtn" onclick="toggleForm()">Hide Editor Form ▲</button>
+      </div>
+
+      <form id="productForm" onsubmit="saveProduct(event)" autocomplete="off">
+        <input type="hidden" id="editId">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="fName">Product Title <span class="label-required">*</span></label>
+            <input type="text" id="fName" placeholder="e.g. Crimson Rose Elegance Bouquet" required>
+          </div>
+          <div class="form-group">
+            <label for="fCategory">Collection / Occasion <span class="label-required">*</span></label>
+            <select id="fCategory" required>
+              <option value="">Select Category</option>
+              <option value="birthday">Birthday Celebrations</option>
+              <option value="anniversary">Anniversary Milestones</option>
+              <option value="wedding">Wedding &amp; Bridal</option>
+              <option value="festival">Festive &amp; Cultural</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fPrice">Selling Price (₹) <span class="label-required">*</span></label>
+            <input type="number" id="fPrice" placeholder="e.g. 799" min="1" required>
+          </div>
+          <div class="form-group">
+            <label for="fOriginalPrice">Original Price / M.R.P. (₹)</label>
+            <input type="number" id="fOriginalPrice" placeholder="e.g. 999" min="1">
+          </div>
+          <div class="form-group">
+            <label for="fTag">Curator Tag</label>
+            <input type="text" id="fTag" placeholder="e.g. Bestseller, Luxury Edition">
+          </div>
+          <div class="form-group">
+            <label for="fStock">Inventory Stock <span class="label-required">*</span></label>
+            <input type="number" id="fStock" placeholder="e.g. 25" min="0" required>
+          </div>
+          <div class="form-group">
+            <label for="fSold">Units Sold</label>
+            <input type="number" id="fSold" placeholder="e.g. 0" min="0" value="0">
+          </div>
+          <div class="form-group">
+            <label for="fRating">Rating <span class="label-hint">(1.0 &ndash; 5.0)</span></label>
+            <input type="number" id="fRating" placeholder="e.g. 4.9" min="1" max="5" step="0.1" value="4.9">
+          </div>
+          <div class="form-group">
+            <label for="fReviews">Review Count</label>
+            <input type="number" id="fReviews" placeholder="e.g. 42" min="0" value="0">
+          </div>
+          <div class="form-group">
+            <label for="fDelivery">Delivery Guarantee</label>
+            <select id="fDelivery">
+              <option value="Same Day">Same Day Dispatch</option>
+              <option value="Next Day">Next Day Delivery</option>
+              <option value="2–3 Days">2–3 Days Custom Order</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fEmoji">Fallback Emoji Icon</label>
+            <input type="text" id="fEmoji" placeholder="e.g. 🌹" maxlength="4">
+          </div>
+          <div class="form-group full-width">
+            <label for="fImage">High-Resolution Photo URL <span class="label-hint">(Direct CDN / Unsplash link)</span></label>
+            <input type="url" id="fImage" placeholder="https://images.unsplash.com/...">
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="fDesc">Product Description <span class="label-required">*</span></label>
+          <textarea id="fDesc" rows="3" placeholder="Provide elegant, sensory product copy detailing materials, scents, or origin..." required></textarea>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="fIncludes">Package Inclusions <span class="label-hint">(one item per line)</span></label>
+          <textarea id="fIncludes" rows="3" placeholder="24 Fresh Crimson Roses&#10;Eco-Friendly Kraft Wrapping&#10;Satin Ribbon&#10;Handwritten Greeting Card"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="submitBtn">Publish Product to Store</button>
+          <button type="button" class="btn-cancel" id="cancelBtn" onclick="resetForm()" style="display:none">Cancel Edit</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Product List Table -->
+    <div class="admin-panel">
+      <div class="admin-panel-header">
+        <h3>Master Catalog Inventory</h3>
+        <input type="search" id="adminSearch" placeholder="Search catalog by name or category..." oninput="renderAdminTable()" class="admin-search">
+      </div>
+      <div class="table-wrap">
+        <table class="admin-table" id="adminProductTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Thumbnail</th>
+              <th>Product Title</th>
+              <th>Category</th>
+              <th>Pricing</th>
+              <th>Stock</th>
+              <th>Dispatched</th>
+              <th>Rating</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sales Report -->
+    <div class="admin-panel">
+      <div class="admin-panel-header" style="margin-bottom:0;padding-bottom:1rem">
+        <h3>Recent Order &amp; Dispatch Ledger</h3>
+      </div>
+      <div class="table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Date</th><th>Product Purchased</th><th>Client Name</th><th>Order Value</th><th>Status</th></tr>
+          </thead>
+          <tbody id="salesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-card delete-modal">
+    <span class="delete-icon">⚠️</span>
+    <h3>Confirm Product Removal</h3>
+    <p id="deleteModalMsg">Are you certain you wish to remove this product from the master catalog? This action will immediately delete it from client view.</p>
+    <div class="delete-actions">
+      <button class="btn-cancel-md" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn-delete-confirm" id="confirmDeleteBtn">Delete Product</button>
+    </div>
+  </div>
+</div>
+
+<div id="footer"></div>
+<script src="js/main.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
